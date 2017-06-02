@@ -18,6 +18,8 @@ SCREEN_WIDTH, SCREEN_HEIGHT = 400, 400
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('CATch')
 
+clock = pygame.time.Clock()
+
 gameExit = False
 
 #for now the cat is represented by a square block 
