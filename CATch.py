@@ -14,27 +14,75 @@ black = (0, 0, 0)
 red = (255, 0, 0)
 green = (0, 255, 0) 
 
+#images
+background = pygame.image.load('background.jpg')
+
 cat_left = pygame.image.load('CAT_LEFT.png')
 cat_right = pygame.image.load('CAT_RIGHT.png')
+
+food_burger = pygame.image.load('food_burger.png')
+food_noodles = pygame.image.load('food_noodles.png')
+food_pie = pygame.image.load('food_pie.png')
+food_rice = pygame.image.load('food_rice.png')
+food_shortcake = pygame.image.load('food_shortcake.png')
+food_donut = pygame.image.load('food_donut.png')
+
+foodLst = [food_burger, food_noodles, food_pie, food_rice, food_shortcake, food_donut]
 
 # game parameters
 SCREEN_WIDTH, SCREEN_HEIGHT = 600, 600
 FPS = 10
-
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption('CATch')
 clock = pygame.time.Clock()
 
-font = pygame.font.SysFont(None, 25)
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+backgroundRect = background.get_rect()
 
-def text_objects(text, color):
-    textSurface = font.render(text, True, color)
+pygame.display.set_caption('CATch')
+
+smallFont = pygame.font.SysFont("comicsansms", 25)
+medFont = pygame.font.SysFont("comicsansms", 50)
+largeFont = pygame.font.SysFont("comicsansms", 80)
+
+
+def text_objects(text, color, size):
+    if size == "small": 
+        textSurface = smallFont.render(text, True, color)
+    elif size == "medium": 
+        textSurface = medFont.render(text, True, color)
+    elif size == "large": 
+        textSurface = largeFont.render(text, True, color)
     return textSurface, textSurface.get_rect()
 
-def message_to_screen(msg, color):
-    textSurf, textRect = text_objects(msg, color)
-    textRect.center = (SCREEN_WIDTH/2), (SCREEN_HEIGHT/2)
-    screen.blit(textSurf, textRect) 
+def message_to_screen(msg, color, y_displace = 0, size = "small"):
+    textSurf, textRect = text_objects(msg, color, size)
+    textRect.center = (SCREEN_WIDTH/2), (SCREEN_HEIGHT/2)+y_displace
+    screen.blit(textSurf, textRect)
+    
+def gameIntro():
+
+    intro = True
+    
+    while intro:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                intro = False
+                
+        screen.fill(white)
+        message_to_screen("welcome to", green, -175, "medium")
+        message_to_screen("CATch", green, -90, "large")
+        message_to_screen("The objective of this game is to",
+                          black)
+        message_to_screen("eat all the food that you possibly can", black, 30)
+        message_to_screen("by catching the food as it falls down the screen", black, 60)
+        message_to_screen("Press any key to play!", black, 150)
+
+        pygame.display.update()
+        clock.tick(5)
+
 
 # main game loop
 def gameLoop():
@@ -45,7 +93,7 @@ def gameLoop():
     points = 0
     lives = 3
     #for now the cat is represented by a square block 
-    cat_size = SCREEN_WIDTH/10  
+    cat_size = SCREEN_WIDTH/6  
     #coordinates of the cat 
     cat_x = SCREEN_WIDTH/2 - cat_size/2 
     cat_y = SCREEN_HEIGHT - cat_size
@@ -102,7 +150,8 @@ def gameLoop():
         if len(FOOD_LST) == 0 or FOOD_LST[0].get_y() > SCREEN_HEIGHT*random.randrange(4,9)/9:
             food_x = random.randrange(0, int(SCREEN_WIDTH - food_size))
             food_y = 0
-            food = Food(food_x, food_y, food_size) 
+            food_type = foodLst[random.randrange(0, len(foodLst))]
+            food = Food(food_x, food_y, food_size, food_type) 
             FOOD_LST.insert(0, food)
         if trash_y < SCREEN_HEIGHT:
             trash_y += food_size/2
@@ -117,18 +166,18 @@ def gameLoop():
                 lives -= 1 
 
         #drawing everything 
-        screen.fill(white)
+        screen.blit(background, backgroundRect)
         for food in FOOD_LST:
             food.update_y(food.get_size()/2)
-            food.draw_it(screen)
+            screen.blit(food.get_type(), (food.get_x(), food.get_y()))
 
         screen.blit(CAT, (cat_x, cat_y)) 
-        HP = 'Lives:' + str(lives)
+        HP = 'Lives: ' + str(lives)
         pts = 'Points: ' + str(points)
-        HP_text = font.render(HP, True, green)
-        pts_text = font.render(pts, True, green)
-        screen.blit(HP_text, [SCREEN_WIDTH*.8, 50])
-        screen.blit(pts_text, [SCREEN_WIDTH*.8, 69])
+        HP_text = smallFont.render(HP, True, green)
+        pts_text = smallFont.render(pts, True, green)
+        screen.blit(HP_text, [SCREEN_WIDTH*.75, 33])
+        screen.blit(pts_text, [SCREEN_WIDTH*.75, 66])
         
         pygame.display.update()
 
@@ -136,7 +185,9 @@ def gameLoop():
 
         while gameOver == True:
             screen.fill(white)
-            message_to_screen("Game Over: Press C to play again or Q to quit", red)
+            message_to_screen("Game Over", red, -80, "large")
+            message_to_screen("Your score: " + str(points), black, 40)
+            message_to_screen("Press C to play again or Q to quit", black, 75)
             pygame.display.update()
 
             for event in pygame.event.get():
@@ -152,5 +203,6 @@ def gameLoop():
 
     pygame.quit()
     quit()
- 
+
+gameIntro() 
 gameLoop()
