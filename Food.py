@@ -4,12 +4,13 @@ import math
 
 
 class Food(object):
-    def __init__(self, x, y, size):
+    def __init__(self, x, y, size, food_type):
         self.x = x
         self.y = y
         self.size = size 
         self.color = (0, 255, 0) #green
         self.points = 10
+        self.food_type = food_type
         
     def get_x(self):
         return self.x
@@ -22,6 +23,9 @@ class Food(object):
 
     def get_points(self):
         return self.points
+
+    def get_type(self):
+        return self.food_type
 
     def update_x(self, change_x):
         self.x += change_x
